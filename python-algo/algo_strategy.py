@@ -117,7 +117,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
             # Lastly, if we have spare SP, let's build some supports
            
-            game_state.attempt_spawn(SUPPORT, self.region6.getSupportsList)
+            game_state.attempt_spawn(SUPPORT, self.region6.getSupportsList())
 
     def build_defences(self, game_state):
         """
@@ -137,21 +137,21 @@ class AlgoStrategy(gamelib.AlgoCore):
         
         # Always try to keep region 1 and region 2 walls up
         if (game_state.turn_number % 1 == 0):
-            game_state.attempt_spawn(WALL, self.region1.getWallsList + self.region1.getTurretsList)
-            game_state.attempt_spawn(TURRET, self.region1.getTurretsList + self.region1.getWallsList) 
+            game_state.attempt_spawn(WALL, self.region1.getWallsList() + self.region1.getTurretsList())
+            game_state.attempt_spawn(TURRET, self.region1.getTurretsList() + self.region1.getWallsList()) 
         
         # If we have enough SP, we can add more walls to region 3, 4 and 5
         if (game_state.turn_number % 2 == 0):
-            game_state.attempt_spawn(WALL, self.region3.getWallsList)
-            game_state.attempt_spawn(TURRET, self.region3.getTurretsList)
+            game_state.attempt_spawn(WALL, self.region3.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
         
         if (game_state.turn_number % 3 == 0):
-            game_state.attempt_spawn(WALL, self.region4.getWallsList)
-            game_state.attempt_spawn(TURRET, self.region4.getTurretsList)
+            game_state.attempt_spawn(WALL, self.region4.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region4.getTurretsList())
 
         if (game_state.turn_number % 4 == 0):
-            game_state.attempt_spawn(WALL, self.region5.getWallsList)
-            game_state.attempt_spawn(TURRET, self.region5.getTurretsList)
+            game_state.attempt_spawn(WALL, self.region5.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region5.getTurretsList())
 
         # Try to update walls if we have enough MP to soak more damage
         # Have different regions with sets of co-ordinates
