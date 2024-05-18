@@ -4,9 +4,8 @@ import math
 import warnings
 from sys import maxsize
 import json
-oim
 from region_coordinates import region1_values, region2_values, region3_values, region4_values, region5_values, region6_values
-
+from region import Region
 """
 Most of the algo code you write will be in this file unless you create new
 modules yourself. Start by modifying the 'on_turn' function.
