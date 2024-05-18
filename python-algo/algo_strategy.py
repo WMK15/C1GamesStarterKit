@@ -4,7 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
-from region import Region 
+oim
 from region_coordinates import region1_values, region2_values, region3_values, region4_values, region5_values, region6_values
 
 """
