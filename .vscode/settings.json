@@ -1,0 +1,3 @@
+{
+  "python.analysis.extraPaths": ["./python-algo/extended_functionality"]
+}

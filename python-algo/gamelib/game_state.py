@@ -35,8 +35,8 @@ class GameState:
 
         * ARENA_SIZE (int): The size of the arena
         * HALF_ARENA (int): Half the size of the arena
-        * MP (int): A constant representing the Mobile Points resource, used in the get_resource function
-        * SP (int): A constant representing the SP resource, used in the get_resource function
+        * MP (int): A constant representing the Mobile Points resource, used in the get_resource function // Mobile points
+        * SP (int): A constant representing the SP resource, used in the get_resource function // Structure points
          
         * game_map (:obj: GameMap): The current GameMap. To retrieve a list of GameUnits at a location, use game_map[x, y]
         * turn_number (int): The current turn number. Starts at 0.

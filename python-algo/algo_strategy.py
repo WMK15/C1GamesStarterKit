@@ -4,7 +4,8 @@ import math
 import warnings
 from sys import maxsize
 import json
-
+from region import Region 
+from region_coordinates import region1_values, region2_values, region3_values, region4_values, region5_values, region6_values
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -20,11 +21,25 @@ Advanced strategy tips:
 """
 
 class AlgoStrategy(gamelib.AlgoCore):
+
+    region1 = None
+    region2 = None
+    region3 = None
+    region4 = None
+    region5 = None
+
     def __init__(self):
         super().__init__()
         seed = random.randrange(maxsize)
         random.seed(seed)
         gamelib.debug_write('Random seed: {}'.format(seed))
+
+        self.region1 = Region(1, [], region1_values["valid_walls"], [], [])
+        self.region2 = Region(2, [], region2_values["valid_walls"], [], [])
+        self.region3 = Region(3, [], region3_values["valid_walls"], [], [])
+        self.region4 = Region(4, [], region4_values["valid_walls"], [], [])
+        self.region5 = Region(5, [], region5_values["valid_walls"], [], [])
+        self.region6 = Region(6, [], [], [], region6_values["valid_supports"])
 
     def on_game_start(self, config):
         """ 
@@ -68,38 +83,42 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def starter_strategy(self, game_state):
         """
-        For defense we will use a spread out layout and some interceptors early on.
-        We will place turrets near locations the opponent managed to score on.
-        For offense we will use long range demolishers if they place stationary units near the enemy's front.
-        If there are no stationary units to attack in the front, we will send Scouts to try and score quickly.
+        1. first two turns: build walls and send scouts
+        2. third turn: send interceptors and make turrets
+        3. fourth turn: send stacked demolishers and build support
+
+        Clash of Clans style:
+        Walls on the outside with a few gaps for troops
+        Build walls around turrets so that the demolisher can't reach it, but the turrets can attack them.
+        Pathways for the rest of the troops to pass through
         """
         # First, place basic defenses
         self.build_defences(game_state)
         # Now build reactive defenses based on where the enemy scored
         self.build_reactive_defense(game_state)
 
-        # If the turn is less than 5, stall with interceptors and wait to see enemy's base
-        if game_state.turn_number < 5:
+        # If the turn is less than 5, stall with interceptors asnd wait to see enemy's base
+        if game_state.turn_number % 4 == 0:
             self.stall_with_interceptors(game_state)
         else:
             # Now let's analyze the enemy base to see where their defenses are concentrated.
             # If they have many units in the front we can build a line for our demolishers to attack them at long range.
-            if self.detect_enemy_unit(game_state, unit_type=None, valid_x=None, valid_y=[14, 15]) > 10:
-                self.demolisher_line_strategy(game_state)
-            else:
-                # They don't have many units in the front so lets figure out their least defended area and send Scouts there.
+            # if self.detect_enemy_unit(game_state, unit_type=None, valid_x=None, valid_y=[14, 15]) > 10:
+            #     self.demolisher_line_strategy(game_state)
+            # else:
+            # They don't have many units in the front so lets figure out their least defended area and send Scouts there.
 
-                # Only spawn Scouts every other turn
-                # Sending more at once is better since attacks can only hit a single scout at a time
-                if game_state.turn_number % 2 == 1:
-                    # To simplify we will just check sending them from back left and right
-                    scout_spawn_location_options = [[13, 0], [14, 0]]
-                    best_location = self.least_damage_spawn_location(game_state, scout_spawn_location_options)
-                    game_state.attempt_spawn(SCOUT, best_location, 1000)
+            # Only spawn Scouts every other turn
+            # Sending more at once is better since attacks can only hit a single scout at a time
+            if game_state.turn_number % 3 == 0:
+                # To simplify we will just check sending them from back left and right
+                scout_spawn_location_options = [[17, 3], [10, 3]]
+                best_location = self.least_damage_spawn_location(game_state, scout_spawn_location_options)
+                game_state.attempt_spawn(SCOUT, best_location, 5)
 
-                # Lastly, if we have spare SP, let's build some supports
-                support_locations = [[13, 2], [14, 2], [13, 3], [14, 3]]
-                game_state.attempt_spawn(SUPPORT, support_locations)
+            # Lastly, if we have spare SP, let's build some supports
+           
+            game_state.attempt_spawn(SUPPORT, self.region6.getSupportsList)
 
     def build_defences(self, game_state):
         """
@@ -108,17 +127,41 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
         # More community tools available at: https://terminal.c1games.com/rules#Download
-
-        # Place turrets that attack enemy units
-        turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
+        
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
-        game_state.attempt_spawn(TURRET, turret_locations)
+        
         
         # Place walls in front of turrets to soak up damage for them
-        wall_locations = [[8, 12], [19, 12]]
-        game_state.attempt_spawn(WALL, wall_locations)
-        # upgrade walls so they soak more damage
-        game_state.attempt_upgrade(wall_locations)
+        # Region 1 and region 2 walls have the highest priority
+        wall_locations = []
+        turret_locations = []
+        
+        # Always try to keep region 1 and region 2 walls up
+        if (game_state.turn_number % 1 == 0):
+            game_state.attempt_spawn(WALL, self.region1.getWallsList + self.region1.getTurretsList)
+            game_state.attempt_spawn(TURRET, self.region1.getTurretsList + self.region1.getWallsList) 
+        
+        # If we have enough SP, we can add more walls to region 3, 4 and 5
+        if (game_state.turn_number % 2 == 0):
+            game_state.attempt_spawn(WALL, self.region3.getWallsList)
+            game_state.attempt_spawn(TURRET, self.region3.getTurretsList)
+        
+        if (game_state.turn_number % 3 == 0):
+            game_state.attempt_spawn(WALL, self.region4.getWallsList)
+            game_state.attempt_spawn(TURRET, self.region4.getTurretsList)
+
+        if (game_state.turn_number % 4 == 0):
+            game_state.attempt_spawn(WALL, self.region5.getWallsList)
+            game_state.attempt_spawn(TURRET, self.region5.getTurretsList)
+
+        # Try to update walls if we have enough MP to soak more damage
+        # Have different regions with sets of co-ordinates
+        # Arrays for each region 
+
+        # Empty regions to store walls, turrets and supports
+
+        if (game_state.get_resource(SP) > 25):
+            game_state.attempt_upgrade(wall_locations)
 
     def build_reactive_defense(self, game_state):
         """
