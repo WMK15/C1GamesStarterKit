@@ -20,7 +20,6 @@ Advanced strategy tips:
 """
 
 class AlgoStrategy(gamelib.AlgoCore):
-
     region1 = None
     region2 = None
     region3 = None
@@ -138,19 +137,19 @@ class AlgoStrategy(gamelib.AlgoCore):
         
         # Always try to keep region 1 and region 2 walls up
         if (game_state.turn_number % 1 == 0):
-            game_state.attempt_spawn(WALL, self.region1.getWallsList() + self.region1.getTurretsList())
-            game_state.attempt_spawn(TURRET, self.region1.getTurretsList() + self.region1.getWallsList()) 
+            game_state.attempt_spawn(WALL, self.region1.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region1.getTurretsList()) 
+            game_state.attempt_spawn(WALL, self.region2.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region2.getTurretsList())
         
         # If we have enough SP, we can add more walls to region 3, 4 and 5
         if (game_state.turn_number % 2 == 0):
             game_state.attempt_spawn(WALL, self.region3.getWallsList())
             game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
-        
-        if (game_state.turn_number % 3 == 0):
             game_state.attempt_spawn(WALL, self.region4.getWallsList())
-            game_state.attempt_spawn(TURRET, self.region4.getTurretsList())
+            game_state.attempt_spawn(TURRET, self.region4.getTurretsList())    
 
-        if (game_state.turn_number % 4 == 0):
+        if (game_state.turn_number % 3 == 0):
             game_state.attempt_spawn(WALL, self.region5.getWallsList())
             game_state.attempt_spawn(TURRET, self.region5.getTurretsList())
 
