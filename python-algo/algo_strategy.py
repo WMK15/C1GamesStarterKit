@@ -94,28 +94,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         # Now build reactive defenses based on where the enemy scored
         self.build_reactive_defense(game_state)
 
-        # If the turn is less than 5, stall with interceptors asnd wait to see enemy's base
-        if game_state.turn_number % 4 == 0:
-            self.stall_with_interceptors(game_state)
-        else:
-            # Now let's analyze the enemy base to see where their defenses are concentrated.
-            # If they have many units in the front we can build a line for our demolishers to attack them at long range.
-            # if self.detect_enemy_unit(game_state, unit_type=None, valid_x=None, valid_y=[14, 15]) > 10:
-            #     self.demolisher_line_strategy(game_state)
-            # else:
-            # They don't have many units in the front so lets figure out their least defended area and send Scouts there.
+        if game_state.turn_number == 0:
+            game_state.attempt_spawn(SCOUT, [13, 0], 5)
 
-            # Only spawn Scouts every other turn
-            # Sending more at once is better since attacks can only hit a single scout at a time
-            if game_state.turn_number % 3 == 0:
-                # To simplify we will just check sending them from back left and right
-                scout_spawn_location_options = [[17, 3], [10, 3]]
-                best_location = self.least_damage_spawn_location(game_state, scout_spawn_location_options)
-                game_state.attempt_spawn(SCOUT, best_location, 5)
-
-            # Lastly, if we have spare SP, let's build some supports
-           
-            game_state.attempt_spawn(SUPPORT, self.region6.getSupportsList())
+        if game_state.turn_number % 3 == 0:
+            # To simplify we will just check sending them from back left and right
+            scout_spawn_location_options = [[17, 3], [10, 3]]
+            best_location = self.least_damage_spawn_location(game_state, scout_spawn_location_options)
+            game_state.attempt_spawn(SCOUT, best_location, 5)
 
     def build_defences(self, game_state):
         """
@@ -126,27 +112,31 @@ class AlgoStrategy(gamelib.AlgoCore):
         turret_locations = [self.region1.getTurretsList() + self.region2.getTurretsList() + self.region5.getTurretsList() + self.region3.getTurretsList()]
 
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
-        if (game_state.turn_number == 1):
+        if (game_state.turn_number == 0 or game_state.turn_number % 1 == 0): # every round 
             game_state.attempt_spawn(WALL, self.region1.getWallsList() + self.region2.getWallsList() + self.region5.getWallsList())
             game_state.attempt_spawn(TURRET, self.region1.getTurretsList() + self.region2.getTurretsList() + self.region5.getTurretsList())
 
         # If we have enough SP, we can add more walls to region 3
-        if (game_state.turn_number == 2):
+        if (game_state.turn_number == 1 or game_state.turn_number % 2 == 0): # every other round 
             game_state.attempt_spawn(WALL, self.region3.getWallsList())
             game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
-            
-        for i in range(0, len(self.region1.getWallsList())):
-                if (game_state.get_resource(SP) > 21):
-                    game_state.attempt_spawn(WALL, self.region1.getWallsList()[i])
-                else:
-                    break
 
-        if (game_state.turn_number > 2 and game_state.turn_number % 4 == 0 and game_state.get_resource(SP) > 30):
-            for i in range(0, len(self.region1.getTurretsList())):
-                if (game_state.get_resource(SP) > 21):
-                    game_state.attempt_spawn(WALL, self.region1.getTurretsList()[i])
-                else:
-                    break
+        
+            
+
+            
+        # for i in range(0, len(self.region1.getWallsList())):
+        #         if (game_state.get_resource(SP) > 21):
+        #             game_state.attempt_spawn(WALL, self.region1.getWallsList()[i])
+        #         else:
+        #             break
+
+        # if (game_state.turn_number > 2 and game_state.turn_number % 4 == 0 and game_state.get_resource(SP) > 30):
+        #     for i in range(0, len(self.region1.getTurretsList())):
+        #         if (game_state.get_resource(SP) > 21):
+        #             game_state.attempt_spawn(WALL, self.region1.getTurretsList()[i])
+        #         else:
+        #             break
 
         self.rebuild_defences(game_state, wall_locations, turret_locations)
 
