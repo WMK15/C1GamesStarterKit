@@ -303,7 +303,6 @@ class GameState:
 
         return cost_base
 
-
     def can_spawn(self, unit_type, location, num=1):
         """Check if we can spawn a unit at a location. 
 
