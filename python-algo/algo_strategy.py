@@ -4,7 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
-from region_coordinates import region1_values, region2_values, region3_values, region4_values, region5_values, region6_values
+from region_coordinates import region1_values, region2_values, region3_values, region5_values, region6_values
 from region import Region
 """
 Most of the algo code you write will be in this file unless you create new
@@ -122,18 +122,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         Build basic defenses using hardcoded locations.
         Remember to defend corners and avoid placing units in the front where enemy demolishers can attack them.
         """
-        # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
-        # More community tools available at: https://terminal.c1games.com/rules#Download
-        
+        wall_locations = [self.region1.getWallsList() + self.region2.getWallsList() + self.region5.getWallsList() + self.region3.getWallsList()]
+        turret_locations = [self.region1.getTurretsList() + self.region2.getTurretsList() + self.region5.getTurretsList() + self.region3.getTurretsList()]
+
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
-        
-        
-        # Place walls in front of turrets to soak up damage for them
-        # Region 1 and region 2 walls have the highest priority
-        wall_locations = []
-        turret_locations = []
-        
-        # Always try to keep region 1 and region 2 walls up
         if (game_state.turn_number == 1):
             game_state.attempt_spawn(WALL, self.region1.getWallsList() + self.region2.getWallsList() + self.region5.getWallsList())
             game_state.attempt_spawn(TURRET, self.region1.getTurretsList() + self.region2.getTurretsList() + self.region5.getTurretsList())
@@ -143,13 +135,25 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(WALL, self.region3.getWallsList())
             game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
             
-        if (game_state.get_resource(SP) > 30):
-            game_state.attempt_upgrade(wall_locations)
+        for i in range(0, len(self.region1.getWallsList())):
+                if (game_state.get_resource(SP) > 21):
+                    game_state.attempt_spawn(WALL, self.region1.getWallsList()[i])
+                else:
+                    break
 
-        if (game_state.turn_number > 2 and game_state.turn_number % 2 == 0):
+        if (game_state.turn_number > 2 and game_state.turn_number % 4 == 0 and game_state.get_resource(SP) > 30):
             game_state.attempt_upgrade(turret_locations)
-            
-    
+
+        self.rebuild_defences(game_state, wall_locations, turret_locations)
+
+
+    def rebuild_defences(self, game_state, walls, turrets):
+        """
+        Rebuild basic defenses using hardcoded locations.
+        """
+        # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
+        game_state.attempt_spawn(WALL, walls)
+        game_state.attempt_spawn(TURRET, turrets)
     
     def scout_strategy(self, game_state):
         """
