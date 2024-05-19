@@ -32,11 +32,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         random.seed(seed)
         gamelib.debug_write('Random seed: {}'.format(seed))
 
-        self.region1 = Region(1, [], region1_values["valid_walls"], [], [])
-        self.region2 = Region(2, [], region2_values["valid_walls"], [], [])
-        self.region3 = Region(3, [], region3_values["valid_walls"], [], [])
-        self.region4 = Region(4, [], region4_values["valid_walls"], [], [])
-        self.region5 = Region(5, [], region5_values["valid_walls"], [], [])
+        self.region1 = Region(1, [], region1_values["valid_walls"], region1_values["valid_turrets"], [])
+        self.region2 = Region(2, [], region2_values["valid_walls"], region2_values["valid_turrets"], [])
+        self.region3 = Region(3, [], region3_values["valid_walls"], region3_values["valid_turrets"], [])
+        self.region4 = Region(4, [], region4_values["valid_walls"], region4_values["valid_turrets"], [])
+        self.region5 = Region(5, [], region5_values["valid_walls"], region5_values["valid_turrets"], [])
         self.region6 = Region(6, [], [], [], region6_values["valid_supports"])
 
     def on_game_start(self, config):
@@ -68,7 +68,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state = gamelib.GameState(self.config, turn_state)
         game_state.attempt_spawn(DEMOLISHER, [24, 10], 3)
         gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
-        game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
+        game_state.suppress_warnings(False)  #Comment or remove this line to enable warnings.
 
         self.starter_strategy(game_state)
 
@@ -137,17 +137,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         
         # Always try to keep region 1 and region 2 walls up
         if (game_state.turn_number % 1 == 0):
-            game_state.attempt_spawn(WALL, self.region1.getWallsList())
-            game_state.attempt_spawn(TURRET, self.region1.getTurretsList()) 
-            game_state.attempt_spawn(WALL, self.region2.getWallsList())
-            game_state.attempt_spawn(TURRET, self.region2.getTurretsList())
+            game_state.attempt_spawn(WALL, self.region1.getWallsList() + self.region2.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region1.getTurretsList() + self.region2.getTurretsList()) 
         
         # If we have enough SP, we can add more walls to region 3, 4 and 5
         if (game_state.turn_number % 2 == 0):
-            game_state.attempt_spawn(WALL, self.region3.getWallsList())
-            game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
-            game_state.attempt_spawn(WALL, self.region4.getWallsList())
-            game_state.attempt_spawn(TURRET, self.region4.getTurretsList())    
+            game_state.attempt_spawn(WALL, self.region3.getWallsList() + self.region4.getWallsList())
+            game_state.attempt_spawn(TURRET, self.region3.getTurretsList() + self.region4.getTurretsList())
 
         if (game_state.turn_number % 3 == 0):
             game_state.attempt_spawn(WALL, self.region5.getWallsList())
