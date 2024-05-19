@@ -120,10 +120,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         if (game_state.turn_number == 1 or game_state.turn_number % 2 == 0): # every other round 
             game_state.attempt_spawn(WALL, self.region3.getWallsList())
             game_state.attempt_spawn(TURRET, self.region3.getTurretsList())
-
-        
-            
-
             
         # for i in range(0, len(self.region1.getWallsList())):
         #         if (game_state.get_resource(SP) > 21):
