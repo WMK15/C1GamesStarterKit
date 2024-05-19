@@ -1,5 +1,5 @@
 # Pre-defined valid wall locations for each region
-region1_values = {"valid_walls": [[7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [16, 13], [17, 13], [18, 13], [19, 12], [20, 12]],
+region1_values = {"valid_walls": [[7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [16, 13], [17, 13], [18, 13]],
            "valid_turrets": [[8, 12], [10, 12], [17, 12], [19, 12]],
            "valid_supports": [[7, 12], [11, 12], [16, 12], [20, 12]]}
         
