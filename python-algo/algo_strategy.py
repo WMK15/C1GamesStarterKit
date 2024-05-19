@@ -142,7 +142,11 @@ class AlgoStrategy(gamelib.AlgoCore):
                     break
 
         if (game_state.turn_number > 2 and game_state.turn_number % 4 == 0 and game_state.get_resource(SP) > 30):
-            game_state.attempt_upgrade(turret_locations)
+            for i in range(0, len(self.region1.getTurretsList())):
+                if (game_state.get_resource(SP) > 21):
+                    game_state.attempt_spawn(WALL, self.region1.getTurretsList()[i])
+                else:
+                    break
 
         self.rebuild_defences(game_state, wall_locations, turret_locations)
 
