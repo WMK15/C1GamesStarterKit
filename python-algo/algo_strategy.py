@@ -134,7 +134,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         #         else:
         #             break
 
-        self.rebuild_defences(game_state, wall_locations, turret_locations)
+        # self.rebuild_defences(game_state, wall_locations, turret_locations)
 
 
     def rebuild_defences(self, game_state, walls, turrets):
